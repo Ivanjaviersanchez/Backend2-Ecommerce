@@ -8,6 +8,7 @@ import MongoStore from 'connect-mongo';
 import passport from "passport";               
 import "./strategies/local.strategy.js";       
 import "./strategies/github.strategy.js";
+import "./strategies/jwt.strategy.js";
 
 import authRoutes from './routes/auth.routes.js';
 import productsRouter from "./routes/products.routes.js";

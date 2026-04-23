@@ -1,34 +1,42 @@
 import { verifyToken } from "../services/jwt.service.js";
 
+import jwt from "jsonwebtoken";
+
 export const jwtAuth = (req, res, next) => {
   try {
     let token;
 
-    // 🔹 1. Intentar desde HEADER
+    // 🔹 1. DESDE HEADER
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith("Bearer ")) {
       token = authHeader.split(" ")[1];
     }
 
-    // 🔹 2. Si no hay header, intentar desde COOKIE
+    // 🔹 2. DESDE COOKIE (tu caso principal)
     if (!token && req.cookies?.authToken) {
       token = req.cookies.authToken;
     }
 
-    // 🔹 3. Si no hay token en ningún lado
+    // ❌ SIN TOKEN → 401
     if (!token) {
-      return res.status(401).json({ error: "No token" });
+      return res.status(401).json({
+        error: "Unauthorized",
+        message: "Token missing"
+      });
     }
 
-    // 🔹 4. Verificar token
-    const decoded = verifyToken(token);
+    // 🔐 VERIFICAR TOKEN
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = decoded;
 
     next();
 
   } catch (error) {
-    console.log("JWT ERROR:", error.message);
-    return res.status(403).json({ error: "Token inválido" });
+    // ❌ TOKEN INVÁLIDO → 403
+    return res.status(403).json({
+      error: "Forbidden",
+      message: "Token inválido o expirado"
+    });
   }
 };

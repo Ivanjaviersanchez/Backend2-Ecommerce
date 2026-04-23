@@ -89,3 +89,20 @@ export const logout = (req, res) => {
     res.send('Logout OK');
   });
 };
+
+// 🔥 CURRENT (usuario autenticado con JWT)
+export const current = (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      error: "Unauthorized",
+      message: "Usuario no autenticado"
+    });
+  }
+
+  // 🔐 devolver solo datos mínimos
+  const { password, ...userData } = req.user;
+
+  res.json({
+    user: userData
+  });
+};
