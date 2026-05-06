@@ -7,17 +7,17 @@ import { generateToken } from "../services/jwt.service.js";
 
 const router = Router();
 
-// 🔹 AUTH BÁSICO
+//  AUTH BÁSICO
 router.post('/register', register);
 router.post('/login', login);
 router.get('/profile', profile);
 router.get('/current', jwtAuth, current);
 router.post('/logout', logout);
 
-// 🔥 JWT
+//  JWT
 router.post('/login-jwt', loginJWT);
 
-// 🔒 RUTA PROTEGIDA CON JWT (middleware propio)
+//  RUTA PROTEGIDA CON JWT
 router.get('/profile-jwt', jwtAuth, (req, res) => {
   res.json({
     message: 'Perfil con JWT',
@@ -25,7 +25,7 @@ router.get('/profile-jwt', jwtAuth, (req, res) => {
   });
 });
 
-// 🔒 RUTA PROTEGIDA CON PASSPORT JWT (HEADER + COOKIE)
+//  RUTA PROTEGIDA CON PASSPORT JWT (HEADER + COOKIE)
 router.get(
   "/profile-passport-jwt",
   passport.authenticate("jwt", { session: false }),
@@ -37,7 +37,7 @@ router.get(
   }
 );
 
-// 🔥 CUSTOM CALLBACK (manejo avanzado de errores)
+//  CUSTOM CALLBACK
 router.get("/profile-custom", (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
 
@@ -57,7 +57,7 @@ router.get("/profile-custom", (req, res, next) => {
   })(req, res, next);
 });
 
-// 🔒 RUTA PROTEGIDA POR ROL (ADMIN)
+//  RUTA PROTEGIDA POR ROL (ADMIN)
 router.get(
   "/admin",
   passport.authenticate("jwt", { session: false }),
@@ -70,7 +70,7 @@ router.get(
   }
 );
 
-// 🔥 LOGIN CON PASSPORT LOCAL
+//  LOGIN CON PASSPORT LOCAL
 router.post("/login-passport",
   passport.authenticate("local", { session: false }),
   (req, res) => {
@@ -90,16 +90,15 @@ router.post("/login-passport",
   }
 );
 
-// =======================================
-// 🔥 PASSPORT GITHUB (OAuth)
-// =======================================
 
-// 🔹 1. REDIRECCIÓN A GITHUB
+//  PASSPORT GITHUB (OAuth)
+
+//  1- REDIRECCIÓN A GITHUB
 router.get("/github",
   passport.authenticate("github", { scope: ["user:email"] })
 );
 
-// 🔹 2. CALLBACK
+//  2- CALLBACK
 router.get("/github/callback",
   passport.authenticate("github", {
     session: false,

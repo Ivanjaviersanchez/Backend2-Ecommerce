@@ -6,7 +6,7 @@ import {
   getAllProductsWithOwner
 } from "../services/products.service.js";
 
-// 🔥 helper para unificar sesión + JWT
+//  UNIFICA SESION + JWT
 const getUserFromRequest = (req) => {
   return req.session?.user || req.user;
 };

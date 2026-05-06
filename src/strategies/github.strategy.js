@@ -3,7 +3,7 @@ dotenv.config();
 
 import passport from "passport";
 import { Strategy as GitHubStrategy } from "passport-github2";
-import User from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 
 passport.use(
   new GitHubStrategy(
@@ -14,12 +14,12 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // 🔥 BUSCAR USUARIO POR EMAIL
+        //  BUSCAR USUARIO POR EMAIL
         const email = profile.emails?.[0]?.value;
 
         let user = await User.findOne({ email });
 
-        // 🔥 SI NO EXISTE → CREAR
+        //  SI NO EXISTE LO CREA
         if (!user) {
           user = await User.create({
             username: profile.username,

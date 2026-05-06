@@ -6,18 +6,18 @@ export const jwtAuth = (req, res, next) => {
   try {
     let token;
 
-    // 🔹 1. DESDE HEADER
+    //  1- DESDE HEADER
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith("Bearer ")) {
       token = authHeader.split(" ")[1];
     }
 
-    // 🔹 2. DESDE COOKIE (tu caso principal)
+    //  2- DESDE COOKIE
     if (!token && req.cookies?.authToken) {
       token = req.cookies.authToken;
     }
 
-    // ❌ SIN TOKEN → 401
+    //  SIN TOKEN
     if (!token) {
       return res.status(401).json({
         error: "Unauthorized",
@@ -25,7 +25,7 @@ export const jwtAuth = (req, res, next) => {
       });
     }
 
-    // 🔐 VERIFICAR TOKEN
+    //  VERIFICAR TOKEN
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = decoded;
@@ -33,7 +33,7 @@ export const jwtAuth = (req, res, next) => {
     next();
 
   } catch (error) {
-    // ❌ TOKEN INVÁLIDO → 403
+    //  TOKEN INVÁLIDO
     return res.status(403).json({
       error: "Forbidden",
       message: "Token inválido o expirado"

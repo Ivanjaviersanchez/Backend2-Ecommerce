@@ -19,10 +19,10 @@ app.use(express.json());
 
 app.use(cookieParser());
 
-// 🔥 PASSPORT INIT (ANTES DE LAS RUTAS)
+//  PASSPORT INIT
 app.use(passport.initialize());
 
-// 🔐 SESSION (el sistema es híbrido)
+//  SESSION 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'defaultSecret',
   resave: false,
@@ -40,7 +40,7 @@ app.use(session({
   }
 }));
 
-// 🔗 RUTAS
+//  RUTAS
 app.use('/api/auth', authRoutes);
 app.use("/api/products", productsRouter);
 

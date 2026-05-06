@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 const SECRET = process.env.JWT_SECRET || "supersecret";
 
-// 🔥 Generar token
+//  GENERAR TOKEN
 export const generateToken = (user) => {
   return jwt.sign(
     {
@@ -15,7 +15,7 @@ export const generateToken = (user) => {
   );
 };
 
-// 🔥 Verificar token
+//  VERIFICAR TOKEN
 export const verifyToken = (token) => {
   return jwt.verify(token, SECRET);
 };

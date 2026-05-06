@@ -1,25 +1,31 @@
 import bcrypt from 'bcrypt';
-import User from '../models/user.model.js';
+import { User } from '../models/user.model.js';
 
-export const register = async (username, email, password) => {
+// REGISTER
+export const register = async (userData) => {
+  const { first_name, last_name, email, age, password } = userData;
+
   const userExists = await User.findOne({ email });
 
   if (userExists) {
     throw new Error('El usuario ya existe');
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = await User.create({
-    username,
+    first_name,
+    last_name,
     email,
-    password: hashedPassword,
-    role: "user" // 🔥 CLAVE
+    age,
+    password,
+    role: "user"
   });
 
   return newUser;
 };
 
+// LOGIN
 export const login = async (email, password) => {
   const user = await User.findOne({ email });
 

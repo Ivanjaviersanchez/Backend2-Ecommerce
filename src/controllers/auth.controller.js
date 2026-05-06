@@ -4,16 +4,29 @@ import { generateToken } from "../services/jwt.service.js";
 // REGISTER
 export const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { first_name, last_name, email, age, password } = req.body;
 
-    const user = await authService.register(username, email, password);
-
-    res.send({
-      message: 'Usuario creado',
-      user
+    const user = await authService.register({
+      first_name,
+      last_name,
+      email,
+      age,
+      password
     });
+
+    //  ELIMINA PASSWORD DE RESPUESTA
+    const { password: _, ...userSafe } = user.toObject();
+
+    res.status(201).json({
+      status: "success",
+      payload: userSafe
+    });
+
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(400).json({
+      status: "error",
+      message: error.message
+    });
   }
 };
 
@@ -24,20 +37,25 @@ export const login = async (req, res) => {
   const user = await authService.login(email, password);
 
   if (!user) {
-    return res.status(401).send('Credenciales inválidas');
+    return res.status(401).json({
+      status: "error",
+      message: "Credenciales inválidas"
+    });
   }
 
-  //  SESIÓN
   req.session.user = {
     id: user._id,
     email: user.email,
-    role: user.role //  clave
+    role: user.role
   };
 
-  res.send('Login exitoso');
+  res.json({
+    status: "success",
+    message: "Login exitoso"
+  });
 };
 
-//  LOGIN JWToken
+//  LOGIN JWT
 export const loginJWT = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -45,64 +63,83 @@ export const loginJWT = async (req, res) => {
     const user = await authService.login(email, password);
 
     if (!user) {
-      return res.status(401).send("Credenciales inválidas");
+      return res.status(401).json({
+        status: "error",
+        message: "Credenciales inválidas"
+      });
     }
 
     const token = generateToken(user);
 
-    // 🔥 COOKIE CON JWT (IMPORTANTE PARA ENTREGA FINAL)
     res.cookie("authToken", token, {
-      httpOnly: true,     // no accesible desde JS (seguridad)
-      sameSite: "lax",    // protección CSRF básica
-      secure: false,      // ⚠️ true en producción (https)
-      maxAge: 1000 * 60 * 60 // 1 hora
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+      maxAge: 1000 * 60 * 60
     });
 
     res.json({
+      status: "success",
       message: "Login JWT exitoso",
       token
     });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error en login JWT" });
+    res.status(500).json({
+      status: "error",
+      message: "Error en login JWT"
+    });
   }
 };
 
-// PROFILE
+// PROFILE (SESSION)
 export const profile = (req, res) => {
   if (!req.session.user) {
-    return res.status(401).send('No logueado');
+    return res.status(401).json({
+      status: "error",
+      message: "No logueado"
+    });
   }
 
-  res.send(req.session.user);
+  res.json({
+    status: "success",
+    user: req.session.user
+  });
 };
 
 // LOGOUT
 export const logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      return res.status(500).send('Error al cerrar sesión');
+      return res.status(500).json({
+        status: "error",
+        message: "Error al cerrar sesión"
+      });
     }
 
-    res.clearCookie('connect.sid'); // 🔥 importante
-    res.send('Logout OK');
+    res.clearCookie('connect.sid');
+
+    res.json({
+      status: "success",
+      message: "Logout OK"
+    });
   });
 };
 
-// 🔥 CURRENT (usuario autenticado con JWT)
+//  CURRENT (JWT)
 export const current = (req, res) => {
   if (!req.user) {
     return res.status(401).json({
-      error: "Unauthorized",
+      status: "error",
       message: "Usuario no autenticado"
     });
   }
 
-  // 🔐 devolver solo datos mínimos
   const { password, ...userData } = req.user;
 
   res.json({
+    status: "success",
     user: userData
   });
 };

@@ -1,18 +1,18 @@
 import Product from "../models/product.model.js";
 
-// 📦 GET (usuario)
+//  GET (usuario)
 export const getProducts = async (user) => {
   return await Product.find({ owner: user.id })
     .populate("owner", "email username");
 };
 
-// 📦 GET (admin con relaciones)
+//  GET (admin con relaciones)
 export const getAllProductsWithOwner = async () => {
   return await Product.find()
     .populate("owner", "email username");
 };
 
-// ➕ CREATE
+//  CREATE
 export const createProduct = async (data, user) => {
   return await Product.create({
     ...data,
@@ -20,7 +20,7 @@ export const createProduct = async (data, user) => {
   });
 };
 
-// ✏️ UPDATE
+//  UPDATE
 export const updateProduct = async (id, data, user) => {
   const product = await Product.findById(id);
 
@@ -35,7 +35,7 @@ export const updateProduct = async (id, data, user) => {
   return await Product.findByIdAndUpdate(id, data, { new: true });
 };
 
-// ❌ DELETE
+//  DELETE
 export const deleteProduct = async (id, user) => {
   const product = await Product.findById(id);
 

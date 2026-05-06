@@ -1,13 +1,13 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import User from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 
-// 🔥 CONFIGURACIÓN DE LA ESTRATEGIA
+//  ESTRATEGIA
 passport.use(
   new LocalStrategy(
     {
-      usernameField: "email", // usamos email en vez de username
+      usernameField: "email", 
       passwordField: "password"
     },
     async (email, password, done) => {
