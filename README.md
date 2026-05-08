@@ -1,4 +1,4 @@
-# 🚀 API Backend - Autenticación y Autorización
+#  API Backend - Autenticación y Autorización
 
 ## 📌 Descripción
 
@@ -418,7 +418,7 @@ http://localhost:8080
 
 ## 📌 Conclusión
 
-Se implementó una API completa con:
+Se implementó una API con:
 
 - Autenticación híbrida (Session + JWT)
 - Passport (Local, JWT, GitHub)
