@@ -7,17 +7,17 @@ import { generateToken } from "../services/jwt.service.js";
 
 const router = Router();
 
-//  AUTH BÁSICO
+// AUTH
 router.post('/register', register);
 router.post('/login', login);
 router.get('/profile', profile);
 router.get('/current', jwtAuth, current);
 router.post('/logout', logout);
 
-//  JWT
+// JWT
 router.post('/login-jwt', loginJWT);
 
-//  RUTA PROTEGIDA CON JWT
+//  HEADER + COOKIE
 router.get('/profile-jwt', jwtAuth, (req, res) => {
   res.json({
     message: 'Perfil con JWT',
@@ -25,11 +25,12 @@ router.get('/profile-jwt', jwtAuth, (req, res) => {
   });
 });
 
-//  RUTA PROTEGIDA CON PASSPORT JWT (HEADER + COOKIE)
+//  PASSPORT JWT
 router.get(
   "/profile-passport-jwt",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
+    console.log("✅ Passport JWT OK:", req.user);
     res.json({
       message: "Perfil con Passport JWT",
       user: req.user
@@ -41,23 +42,31 @@ router.get(
 router.get("/profile-custom", (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
 
-    if (err) return next(err);
+    if (err) {
+      console.error("❌ Error Passport:", err);
+      return next(err);
+    }
 
     if (!user) {
+      console.warn("⚠️ Auth fallida:", info?.message);
+
       return res.status(401).json({
-        error: info?.message || "Token inválido o expirado"
+        status: "error",
+        message: info?.message || "Token inválido o expirado"
       });
     }
 
+    console.log("✅ Auth exitosa:", user.email);
+
     return res.json({
-      message: "Perfil con custom callback",
+      status: "success",
       user
     });
 
   })(req, res, next);
 });
 
-//  RUTA PROTEGIDA POR ROL (ADMIN)
+//  ADMIN
 router.get(
   "/admin",
   passport.authenticate("jwt", { session: false }),
@@ -70,7 +79,7 @@ router.get(
   }
 );
 
-//  LOGIN CON PASSPORT LOCAL
+// LOGIN PASSPORT
 router.post("/login-passport",
   passport.authenticate("local", { session: false }),
   (req, res) => {
@@ -90,15 +99,11 @@ router.post("/login-passport",
   }
 );
 
-
-//  PASSPORT GITHUB (OAuth)
-
-//  1- REDIRECCIÓN A GITHUB
+// GITHUB
 router.get("/github",
   passport.authenticate("github", { scope: ["user:email"] })
 );
 
-//  2- CALLBACK
 router.get("/github/callback",
   passport.authenticate("github", {
     session: false,

@@ -14,7 +14,6 @@ export const register = async (req, res) => {
       password
     });
 
-    //  ELIMINA PASSWORD DE RESPUESTA
     const { password: _, ...userSafe } = user.toObject();
 
     res.status(201).json({
@@ -55,7 +54,7 @@ export const login = async (req, res) => {
   });
 };
 
-//  LOGIN JWT
+// LOGIN JWT
 export const loginJWT = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -85,7 +84,7 @@ export const loginJWT = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error en login JWT:", error);
     res.status(500).json({
       status: "error",
       message: "Error en login JWT"
@@ -127,7 +126,7 @@ export const logout = (req, res) => {
   });
 };
 
-//  CURRENT (JWT)
+// CURRENT (JWT)
 export const current = (req, res) => {
   if (!req.user) {
     return res.status(401).json({

@@ -1,23 +1,20 @@
 import { verifyToken } from "../services/jwt.service.js";
 
-import jwt from "jsonwebtoken";
-
 export const jwtAuth = (req, res, next) => {
   try {
     let token;
 
-    //  1- DESDE HEADER
+    // HEADER
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith("Bearer ")) {
       token = authHeader.split(" ")[1];
     }
 
-    //  2- DESDE COOKIE
+    // COOKIE
     if (!token && req.cookies?.authToken) {
       token = req.cookies.authToken;
     }
 
-    //  SIN TOKEN
     if (!token) {
       return res.status(401).json({
         error: "Unauthorized",
@@ -25,15 +22,15 @@ export const jwtAuth = (req, res, next) => {
       });
     }
 
-    //  VERIFICAR TOKEN
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = verifyToken(token);
 
     req.user = decoded;
 
     next();
 
   } catch (error) {
-    //  TOKEN INVÁLIDO
+    console.error("❌ JWT error:", error.message);
+
     return res.status(403).json({
       error: "Forbidden",
       message: "Token inválido o expirado"

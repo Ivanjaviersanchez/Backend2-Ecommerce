@@ -1,6 +1,6 @@
-#  API Backend - Autenticación y Autorización
+# 🚀 API Backend - Autenticación y Autorización
 
-##  Descripción
+## 📌 Descripción
 
 API REST desarrollada con **Node.js + Express** que implementa un sistema completo de autenticación y autorización utilizando:
 
@@ -14,19 +14,21 @@ Permite registrar usuarios, iniciar sesión, generar tokens y proteger rutas con
 
 ---
 
-##  Arquitectura del Proyecto
+## 🧱 Arquitectura del Proyecto
 
 El proyecto está organizado siguiendo buenas prácticas por capas:
 
-/routes        → Definición de endpoints  
-/controllers   → Lógica de negocio  
-/services      → Funciones auxiliares (JWT, auth)  
-/middlewares   → Autenticación y autorización  
+```txt
+/routes        → Definición de endpoints
+/controllers   → Lógica de negocio
+/services      → Funciones auxiliares (JWT, auth)
+/middlewares   → Autenticación y autorización
 /models        → Modelos de datos (MongoDB)
+```
 
 ---
 
-##  Base de Datos
+## 🗄️ Base de Datos
 
 Se utiliza MongoDB Atlas como base de datos principal.
 
@@ -38,61 +40,68 @@ Se utiliza MongoDB Atlas como base de datos principal.
 
 ---
 
-##  Configuración de Variables de Entorno
+## ⚙️ Configuración de Variables de Entorno
 
-###  Archivo `.env`
+### 📄 Archivo `.env`
 
 Este archivo contiene las variables sensibles del proyecto y NO se sube al repositorio.
 
 Ejemplo:
 
-PORT=8080  
-MONGO_URI=tu_uri_mongodb_atlas  
-SESSION_SECRET=secret  
-COOKIE_SECRET=secret  
-JWT_SECRET=secret  
+```env
+PORT=8080
+MONGO_URI=tu_uri_mongodb_atlas
+SESSION_SECRET=secret
+COOKIE_SECRET=secret
+JWT_SECRET=secret
 
-GITHUB_CLIENT_ID=tu_client_id  
-GITHUB_CLIENT_SECRET=tu_secret  
-GITHUB_CALLBACK_URL=http://localhost:8080/api/auth/github/callback  
+GITHUB_CLIENT_ID=tu_client_id
+GITHUB_CLIENT_SECRET=tu_secret
+GITHUB_CALLBACK_URL=http://localhost:8080/api/auth/github/callback
+```
 
 ---
 
-###  Archivo `.env.example`
+### 📄 Archivo `.env.example`
 
 Este archivo SÍ se incluye en el repositorio y sirve como plantilla.
 
-PORT=8080  
+```env
+PORT=8080
 
-MONGO_URI=mongodb+srv://<db_user>:<db_password>@cluster.mongodb.net/backend2  
+MONGO_URI=mongodb+srv://<db_user>:<db_password>@cluster.mongodb.net/backend2
 
-SESSION_SECRET=your_session_secret  
-COOKIE_SECRET=your_cookie_secret  
-JWT_SECRET=your_jwt_secret  
+SESSION_SECRET=your_session_secret
+COOKIE_SECRET=your_cookie_secret
+JWT_SECRET=your_jwt_secret
 
-GITHUB_CLIENT_ID=your_github_client_id  
-GITHUB_CLIENT_SECRET=your_github_client_secret  
-GITHUB_CALLBACK_URL=http://localhost:8080/api/auth/github/callback  
-
----
-
-###  Cómo usarlo
-
-1. Clonar el repositorio  
-2. Crear archivo `.env`  
-3. Copiar contenido de `.env.example`  
-4. Completar con tus credenciales reales  
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+GITHUB_CALLBACK_URL=http://localhost:8080/api/auth/github/callback
+```
 
 ---
 
-##  Flujo de Autenticación
+### 📌 Cómo usarlo
+
+1. Clonar el repositorio
+2. Crear archivo `.env`
+3. Copiar contenido de `.env.example`
+4. Completar con credenciales reales
+
+---
+
+## 🔐 Flujo de Autenticación
 
 ### 1. Registro
 
+```txt
 POST /api/auth/register
+```
 
 Body:
 
+```json
 {
   "first_name": "Ivan",
   "last_name": "Sanchez",
@@ -100,34 +109,61 @@ Body:
   "age": 40,
   "password": "123456"
 }
+```
 
 ✔ Password hasheada con bcrypt  
-✔ Rol por defecto: "user"
+✔ Rol por defecto: `"user"`
 
 ---
 
 ### 2. Login
 
-🔹 Login con sesión  
-POST /api/auth/login  
+#### 🔹 Login con sesión
 
-✔ Guarda usuario en req.session  
+```txt
+POST /api/auth/login
+```
 
----
-
-🔹 Login con JWT  
-POST /api/auth/login-jwt  
-
-✔ Genera token JWT  
-✔ Se envía en JSON y cookie  
+✔ Guarda usuario en `req.session`
 
 ---
 
-🔹 Login con Passport  
-POST /api/auth/login-passport  
+#### 🔹 Login con JWT
+
+```txt
+POST /api/auth/login-jwt
+```
+
+✔ Genera un token JWT  
+✔ Devuelve el token en la respuesta JSON  
+✔ Guarda automáticamente el token en una cookie HttpOnly (`authToken`)  
+
+Esto permite utilizar autenticación de dos maneras:
+
+### ✔ Authorization Header
+
+```txt
+Authorization: Bearer TOKEN
+```
+
+### ✔ Cookie HttpOnly
+
+```txt
+authToken
+```
+
+De esta forma, un único endpoint soporta autenticación tanto por headers como por cookies.
+
+---
+
+#### 🔹 Login con Passport
+
+```txt
+POST /api/auth/login-passport
+```
 
 ✔ Usa estrategia local  
-✔ Genera JWT automáticamente  
+✔ Genera JWT automáticamente
 
 ---
 
@@ -135,82 +171,100 @@ POST /api/auth/login-passport
 
 Se puede enviar el token de dos formas:
 
-Header:
-Authorization: Bearer TOKEN  
+#### ✔ Header
 
-Cookie:
-authToken  
+```txt
+Authorization: Bearer TOKEN
+```
+
+#### ✔ Cookie
+
+```txt
+authToken
+```
 
 ---
 
-##  JWT
+## 🔑 JWT
 
 Payload:
 
+```json
 {
   "id": "user_id",
   "email": "user@email.com",
   "role": "user"
 }
+```
 
 ✔ Expiración: 1 hora  
-✔ Validado en cada request  
+✔ Validado en cada request
 
 ---
 
-##  Cookies
+## 🍪 Cookies
 
 Configuración:
 
+```js
 {
   httpOnly: true,
   sameSite: "lax",
   secure: false
 }
+```
 
 ✔ Protege contra XSS  
-✔ Mitiga CSRF  
+✔ Mitiga CSRF
 
 ---
 
-##  Endpoints
+## 📡 Endpoints
 
-###  AUTH
+### 🔐 AUTH
 
-POST /api/auth/register  
-POST /api/auth/login  
-POST /api/auth/login-jwt  
-POST /api/auth/login-passport  
-POST /api/auth/logout  
-
----
-
-###  Usuario autenticado
-
-GET /api/auth/current  
-GET /api/auth/profile-jwt  
-GET /api/auth/profile-passport-jwt  
+```txt
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/login-jwt
+POST /api/auth/login-passport
+POST /api/auth/logout
+```
 
 ---
 
-###  Passport avanzado
+### 👤 Usuario autenticado
 
-GET /api/auth/profile-custom  
-
-✔ Manejo personalizado de errores JWT  
-
----
-
-###  Rutas protegidas por rol
-
-GET /api/auth/admin  
-
-✔ Requiere role = admin  
-✔ Middleware: authorizeRole(["admin"])  
+```txt
+GET /api/auth/current
+GET /api/auth/profile-jwt
+GET /api/auth/profile-passport-jwt
+```
 
 ---
 
-##  Middleware de Seguridad
+### 🧠 Passport avanzado
+
+```txt
+GET /api/auth/profile-custom
+```
+
+✔ Manejo personalizado de errores JWT
+
+---
+
+### 🔐 Rutas protegidas por rol
+
+```txt
+GET /api/auth/admin
+```
+
+✔ Requiere `role = admin`  
+✔ Middleware: `authorizeRole(["admin"])`
+
+---
+
+## 🔒 Middleware de Seguridad
 
 ### Autenticación
 
@@ -223,59 +277,106 @@ GET /api/auth/admin
 
 ---
 
-##  Manejo de errores
+## ⚠️ Manejo de errores
 
 ### 401 Unauthorized
 
-- No token  
-- Token inválido  
-- Usuario no autenticado  
+- No token
+- Token inválido
+- Usuario no autenticado
 
 Respuesta:
 
+```json
 {
   "status": "error",
   "message": "Usuario no autenticado"
 }
+```
 
 ---
 
 ### 403 Forbidden
 
-- Usuario sin permisos  
+- Usuario sin permisos
 
 Respuesta:
 
+```json
 {
   "error": "No autorizado"
 }
+```
 
 ---
 
-##  Pruebas en Postman
+## 🧪 Pruebas en Postman
 
-1. Registrar usuario  
-POST /api/auth/register  
+### 1. Registrar usuario
 
-2. Login JWT  
-POST /api/auth/login-jwt  
-
-3. Copiar token  
-
-4. Probar rutas protegidas  
-
-GET /api/auth/current  
-GET /api/auth/profile-jwt  
-GET /api/auth/admin  
-
-5. Prueba de roles  
-
-- Usuario normal → 403  
-- Usuario admin → acceso permitido  
+```txt
+POST /api/auth/register
+```
 
 ---
 
-##  Seguridad implementada
+### 2. Login JWT
+
+```txt
+POST /api/auth/login-jwt
+```
+
+Body:
+
+```json
+{
+  "email": "user@test.com",
+  "password": "123456"
+}
+```
+
+---
+
+### 3. Probar autenticación por Authorization Header
+
+```txt
+GET /api/auth/profile-jwt
+```
+
+Header:
+
+```txt
+Authorization: Bearer TOKEN
+```
+
+---
+
+### 4. Probar autenticación por Cookie
+
+```txt
+GET /api/auth/profile-passport-jwt
+```
+
+Cookie:
+
+```txt
+authToken=TOKEN
+```
+
+---
+
+### 5. Probar ruta admin
+
+```txt
+GET /api/auth/admin
+```
+
+✔ Usuario normal → 403 Forbidden  
+✔ Usuario admin → 200 OK
+
+---
+
+## 🔐 Seguridad implementada
 
 ✔ bcrypt (hash de passwords)  
 ✔ JWT con expiración  
@@ -284,31 +385,38 @@ GET /api/auth/admin
 ✔ Control de roles  
 ✔ Passport strategies  
 ✔ Custom callback  
-✔ Validación de token en cada request  
+✔ Validación de token en cada request
 
 ---
 
-##  OAuth con GitHub
+## 🌐 OAuth con GitHub
 
-GET /api/auth/github  
-GET /api/auth/github/callback  
+```txt
+GET /api/auth/github
+GET /api/auth/github/callback
+```
 
 ✔ Login externo  
-✔ Genera JWT automáticamente  
+✔ Genera JWT automáticamente
 
 ---
 
-##  Ejecutar proyecto
+## ▶️ Ejecutar proyecto
 
-npm install  
-npm run dev  
+```bash
+npm install
+npm run dev
+```
 
-Servidor:  
-http://localhost:8080  
+Servidor:
+
+```txt
+http://localhost:8080
+```
 
 ---
 
-##  Conclusión
+## 📌 Conclusión
 
 Se implementó una API completa con:
 
