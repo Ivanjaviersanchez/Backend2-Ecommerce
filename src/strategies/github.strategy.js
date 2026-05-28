@@ -10,21 +10,30 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: "http://localhost:8080/api/auth/github/callback"
+
+      // IMPORTANTE
+      callbackURL: process.env.GITHUB_CALLBACK_URL
     },
+
     async (accessToken, refreshToken, profile, done) => {
       try {
-        //  BUSCAR USUARIO POR EMAIL
+
         const email = profile.emails?.[0]?.value;
 
-        let user = await User.findOne({ email });
+        // BUSCAR USUARIO
+        let user = await User.findOne({
+          email: email || `${profile.username}@github.com`
+        });
 
-        //  SI NO EXISTE LO CREA
+        // CREAR SI NO EXISTE
         if (!user) {
+
           user = await User.create({
-            username: profile.username,
+            first_name: profile.displayName || profile.username,
+            last_name: "GitHubUser",
+            age: 18,
             email: email || `${profile.username}@github.com`,
-            password: "oauth", // placeholder
+            password: "oauthgithub",
             role: "user"
           });
         }
@@ -32,7 +41,9 @@ passport.use(
         return done(null, user);
 
       } catch (error) {
+
         return done(error);
+
       }
     }
   )

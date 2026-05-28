@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { getAllProducts, getAllProductsAdmin, createNewProduct, updateProductController, deleteProductController } from "../controllers/products.controller.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { authorizeRole } from "../middlewares/role.middleware.js";
-import { jwtAuth } from "../middlewares/jwt.middleware.js";
+import { getAllProducts, getAllProductsAdmin, createNewProduct, updateProductController, deleteProductController } from "../../controllers/products.controller.js";
+import { authMiddleware } from "../../middlewares/auth.middleware.js";
+import { authorizeRole } from "../../middlewares/role.middleware.js";
+import { jwtAuth } from "../../middlewares/jwt.middleware.js";
 
 const router = Router();
 

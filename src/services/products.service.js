@@ -3,13 +3,13 @@ import Product from "../models/product.model.js";
 //  GET (usuario)
 export const getProducts = async (user) => {
   return await Product.find({ owner: user.id })
-    .populate("owner", "email username");
+    .populate("owner", "email first_name last_name");
 };
 
 //  GET (admin con relaciones)
 export const getAllProductsWithOwner = async () => {
   return await Product.find()
-    .populate("owner", "email username");
+    .populate("owner", "email first_name last_name");
 };
 
 //  CREATE

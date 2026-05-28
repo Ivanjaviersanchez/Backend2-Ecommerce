@@ -73,7 +73,7 @@ export const loginJWT = async (req, res) => {
     res.cookie("authToken", token, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60
     });
 
@@ -118,6 +118,7 @@ export const logout = (req, res) => {
     }
 
     res.clearCookie('connect.sid');
+    res.clearCookie("authToken");
 
     res.json({
       status: "success",

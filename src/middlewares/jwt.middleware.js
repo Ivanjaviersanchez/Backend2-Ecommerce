@@ -22,9 +22,11 @@ export const jwtAuth = (req, res, next) => {
       });
     }
 
+    console.log("🔐 Verificando JWT...");
     const decoded = verifyToken(token);
 
     req.user = decoded;
+    console.log("✅ JWT válido:", decoded.email);
 
     next();
 

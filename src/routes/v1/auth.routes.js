@@ -1,26 +1,33 @@
 import { Router } from 'express';
-import { register, login, loginJWT, profile, logout, current } from '../controllers/auth.controller.js';
-import { jwtAuth } from '../middlewares/jwt.middleware.js';
-import { authorizeRole } from "../middlewares/role.middleware.js";
+import { register, login, loginJWT, profile, logout, current } from '../../controllers/auth.controller.js';
+import { jwtAuth } from '../../middlewares/jwt.middleware.js';
+import { authorizeRole } from "../../middlewares/role.middleware.js";
+import { validateRegister, validateLogin } from "../../middlewares/validate.middleware.js";
 import passport from "passport";
-import { generateToken } from "../services/jwt.service.js";
+import { generateToken } from "../../services/jwt.service.js";
 
 const router = Router();
 
 // AUTH
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', validateRegister, register);
+router.post('/login', validateLogin, login);
 router.get('/profile', profile);
 router.get('/current', jwtAuth, current);
+router.get("/session", (req, res) => {
+  res.json({
+    session: req.session
+  });
+});
 router.post('/logout', logout);
 
 // JWT
-router.post('/login-jwt', loginJWT);
+router.post('/login-jwt', validateLogin ,loginJWT);
 
 //  HEADER + COOKIE
-router.get('/profile-jwt', jwtAuth, (req, res) => {
-  res.json({
-    message: 'Perfil con JWT',
+router.get("/profile-jwt", jwtAuth, (req, res) => {
+  return res.json({
+    status: "success",
+    message: "Perfil autenticado con JWT",
     user: req.user
   });
 });
@@ -69,11 +76,14 @@ router.get("/profile-custom", (req, res, next) => {
 //  ADMIN
 router.get(
   "/admin",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("jwt", {
+    session: false
+  }),
   authorizeRole(["admin"]),
   (req, res) => {
-    res.json({
-      message: "Bienvenido admin",
+    return res.json({
+      status: "success",
+      message: "Bienvenido administrador",
       user: req.user
     });
   }
@@ -88,7 +98,7 @@ router.post("/login-passport",
     res.cookie("authToken", token, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60
     });
 
@@ -116,14 +126,16 @@ router.get("/github/callback",
     res.cookie("authToken", token, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60
     });
+
+    const { password, ...safeUser } = req.user.toObject();
 
     res.json({
       message: "Login con GitHub exitoso",
       token,
-      user: req.user
+      user: safeUser
     });
   }
 );
