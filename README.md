@@ -1,70 +1,107 @@
-#  API Backend - Autenticación y Autorización
+# Backend2-Ecommerce
 
-## 📌 Descripción
+Sistema de Autenticación Híbrido desarrollado con Node.js, Express y MongoDB.
 
-API REST desarrollada con **Node.js + Express** que implementa un sistema completo de autenticación y autorización utilizando:
-
-- Passport (Local + GitHub + JWT)
-- JWT (JSON Web Tokens)
-- Cookies seguras (HttpOnly)
-- Sesiones (sistema híbrido)
-- MongoDB Atlas (base de datos en la nube)
-
-Permite registrar usuarios, iniciar sesión, generar tokens y proteger rutas con control de acceso por roles.
+Implementa múltiples estrategias de autenticación y autorización utilizando Sessions, JWT y Passport.js, incluyendo autenticación OAuth con GitHub.
 
 ---
 
-## 🧱 Arquitectura del Proyecto
+## Tecnologías Utilizadas
 
-El proyecto está organizado siguiendo buenas prácticas por capas:
+* Node.js
+* Express.js
+* MongoDB Atlas
+* Mongoose
+* Passport.js
+* Passport Local Strategy
+* Passport JWT Strategy
+* Passport GitHub OAuth Strategy
+* JSON Web Tokens (JWT)
+* Express Session
+* Connect Mongo
+* Bcrypt
+* Cookie Parser
+* Dotenv
+
+---
+
+## Características Principales
+
+### Autenticación
+
+* Registro de usuarios
+* Login mediante sesiones
+* Login mediante JWT
+* Login con Passport Local
+* Login OAuth con GitHub
+* Logout con destrucción de sesión
+
+### Autorización
+
+* Protección de rutas mediante JWT
+* Protección de rutas mediante Passport JWT
+* Control de acceso basado en roles
+* Middleware de autorización para administradores
+
+### Seguridad
+
+* Passwords hasheadas con bcrypt
+* Cookies HttpOnly
+* JWT con expiración configurable
+* Protección de rutas privadas
+* Validación de roles
+* Manejo centralizado de errores
+
+---
+
+## Arquitectura
+
+El proyecto sigue una arquitectura modular por capas:
 
 ```txt
-/routes        → Definición de endpoints
-/controllers   → Lógica de negocio
-/services      → Funciones auxiliares (JWT, auth)
-/middlewares   → Autenticación y autorización
-/models        → Modelos de datos (MongoDB)
+src
+├── controllers
+├── middlewares
+├── models
+├── routes
+│   └── v1
+├── services
+├── strategies
+├── app.js
+└── server.js
 ```
 
----
+### Responsabilidades
 
-## 🗄️ Base de Datos
-
-Se utiliza MongoDB Atlas como base de datos principal.
-
-- Conexión mediante mongoose
-- Base: backend2
-- Colecciones principales:
-  - users
-  - sessions
-
----
-
-## ⚙️ Configuración de Variables de Entorno
-
-### 📄 Archivo `.env`
-
-Este archivo contiene las variables sensibles del proyecto y NO se sube al repositorio.
-
-Ejemplo:
-
-```env
-PORT=8080
-MONGO_URI=tu_uri_mongodb_atlas
-SESSION_SECRET=secret
-COOKIE_SECRET=secret
-JWT_SECRET=secret
-
-GITHUB_CLIENT_ID=tu_client_id
-GITHUB_CLIENT_SECRET=tu_secret
-GITHUB_CALLBACK_URL=http://localhost:8080/api/auth/github/callback
-```
+| Capa        | Función                        |
+| ----------- | ------------------------------ |
+| routes      | Definición de endpoints        |
+| controllers | Manejo de requests y responses |
+| services    | Lógica de negocio              |
+| models      | Esquemas MongoDB               |
+| middlewares | Seguridad y validaciones       |
+| strategies  | Estrategias Passport           |
+| app.js      | Configuración de Express       |
 
 ---
 
-### 📄 Archivo `.env.example`
+## Base de Datos
 
-Este archivo SÍ se incluye en el repositorio y sirve como plantilla.
+MongoDB Atlas
+
+Colecciones principales:
+
+* users
+* products
+* sessions
+
+---
+
+## Variables de Entorno
+
+Crear un archivo `.env` utilizando como referencia `.env.example`.
+
+### .env.example
 
 ```env
 PORT=8080
@@ -77,334 +114,39 @@ JWT_SECRET=your_jwt_secret
 
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
-GITHUB_CALLBACK_URL=http://localhost:8080/api/auth/github/callback
+
+GITHUB_CALLBACK_URL=http://localhost:8080/api/v1/auth/github/callback
 ```
 
 ---
 
-### 📌 Cómo usarlo
+## Instalación
 
-1. Clonar el repositorio
-2. Crear archivo `.env`
-3. Copiar contenido de `.env.example`
-4. Completar con credenciales reales
+### Clonar repositorio
 
----
-
-## 🔐 Flujo de Autenticación
-
-### 1. Registro
-
-```txt
-POST /api/auth/register
+```bash
+git clone <repository-url>
 ```
 
-Body:
-
-```json
-{
-  "first_name": "Ivan",
-  "last_name": "Sanchez",
-  "email": "ivan@test.com",
-  "age": 40,
-  "password": "123456"
-}
-```
-
-✔ Password hasheada con bcrypt  
-✔ Rol por defecto: `"user"`
-
----
-
-### 2. Login
-
-#### 🔹 Login con sesión
-
-```txt
-POST /api/auth/login
-```
-
-✔ Guarda usuario en `req.session`
-
----
-
-#### 🔹 Login con JWT
-
-```txt
-POST /api/auth/login-jwt
-```
-
-✔ Genera un token JWT  
-✔ Devuelve el token en la respuesta JSON  
-✔ Guarda automáticamente el token en una cookie HttpOnly (`authToken`)  
-
-Esto permite utilizar autenticación de dos maneras:
-
-### ✔ Authorization Header
-
-```txt
-Authorization: Bearer TOKEN
-```
-
-### ✔ Cookie HttpOnly
-
-```txt
-authToken
-```
-
-De esta forma, un único endpoint soporta autenticación tanto por headers como por cookies.
-
----
-
-#### 🔹 Login con Passport
-
-```txt
-POST /api/auth/login-passport
-```
-
-✔ Usa estrategia local  
-✔ Genera JWT automáticamente
-
----
-
-### 3. Acceso a rutas protegidas
-
-Se puede enviar el token de dos formas:
-
-#### ✔ Header
-
-```txt
-Authorization: Bearer TOKEN
-```
-
-#### ✔ Cookie
-
-```txt
-authToken
-```
-
----
-
-## 🔑 JWT
-
-Payload:
-
-```json
-{
-  "id": "user_id",
-  "email": "user@email.com",
-  "role": "user"
-}
-```
-
-✔ Expiración: 1 hora  
-✔ Validado en cada request
-
----
-
-## 🍪 Cookies
-
-Configuración:
-
-```js
-{
-  httpOnly: true,
-  sameSite: "lax",
-  secure: false
-}
-```
-
-✔ Protege contra XSS  
-✔ Mitiga CSRF
-
----
-
-## 📡 Endpoints
-
-### 🔐 AUTH
-
-```txt
-POST /api/auth/register
-POST /api/auth/login
-POST /api/auth/login-jwt
-POST /api/auth/login-passport
-POST /api/auth/logout
-```
-
----
-
-### 👤 Usuario autenticado
-
-```txt
-GET /api/auth/current
-GET /api/auth/profile-jwt
-GET /api/auth/profile-passport-jwt
-```
-
----
-
-### 🧠 Passport avanzado
-
-```txt
-GET /api/auth/profile-custom
-```
-
-✔ Manejo personalizado de errores JWT
-
----
-
-### 🔐 Rutas protegidas por rol
-
-```txt
-GET /api/auth/admin
-```
-
-✔ Requiere `role = admin`  
-✔ Middleware: `authorizeRole(["admin"])`
-
----
-
-## 🔒 Middleware de Seguridad
-
-### Autenticación
-
-- jwtAuth
-- passport-jwt
-
-### Autorización
-
-- authorizeRole(["admin"])
-
----
-
-## ⚠️ Manejo de errores
-
-### 401 Unauthorized
-
-- No token
-- Token inválido
-- Usuario no autenticado
-
-Respuesta:
-
-```json
-{
-  "status": "error",
-  "message": "Usuario no autenticado"
-}
-```
-
----
-
-### 403 Forbidden
-
-- Usuario sin permisos
-
-Respuesta:
-
-```json
-{
-  "error": "No autorizado"
-}
-```
-
----
-
-## 🧪 Pruebas en Postman
-
-### 1. Registrar usuario
-
-```txt
-POST /api/auth/register
-```
-
----
-
-### 2. Login JWT
-
-```txt
-POST /api/auth/login-jwt
-```
-
-Body:
-
-```json
-{
-  "email": "user@test.com",
-  "password": "123456"
-}
-```
-
----
-
-### 3. Probar autenticación por Authorization Header
-
-```txt
-GET /api/auth/profile-jwt
-```
-
-Header:
-
-```txt
-Authorization: Bearer TOKEN
-```
-
----
-
-### 4. Probar autenticación por Cookie
-
-```txt
-GET /api/auth/profile-passport-jwt
-```
-
-Cookie:
-
-```txt
-authToken=TOKEN
-```
-
----
-
-### 5. Probar ruta admin
-
-```txt
-GET /api/auth/admin
-```
-
-✔ Usuario normal → 403 Forbidden  
-✔ Usuario admin → 200 OK
-
----
-
-## 🔐 Seguridad implementada
-
-✔ bcrypt (hash de passwords)  
-✔ JWT con expiración  
-✔ Cookies HttpOnly  
-✔ Protección de rutas  
-✔ Control de roles  
-✔ Passport strategies  
-✔ Custom callback  
-✔ Validación de token en cada request
-
----
-
-## 🌐 OAuth con GitHub
-
-```txt
-GET /api/auth/github
-GET /api/auth/github/callback
-```
-
-✔ Login externo  
-✔ Genera JWT automáticamente
-
----
-
-## ▶️ Ejecutar proyecto
+### Instalar dependencias
 
 ```bash
 npm install
+```
+
+### Configurar variables de entorno
+
+Crear archivo:
+
+```bash
+.env
+```
+
+Completar valores reales.
+
+### Ejecutar proyecto
+
+```bash
 npm run dev
 ```
 
@@ -416,14 +158,150 @@ http://localhost:8080
 
 ---
 
-## 📌 Conclusión
+## Flujo de Autenticación
 
-Se implementó una API con:
+```txt
+CLIENTE
+   │
+   ▼
+REQUEST
+   │
+   ▼
+ROUTES
+   │
+   ▼
+MIDDLEWARES
+   │
+   ▼
+PASSPORT
+(Local / JWT / GitHub)
+   │
+   ▼
+CONTROLLERS
+   │
+   ▼
+SERVICES
+   │
+   ▼
+MONGODB
+   │
+   ▼
+JWT / SESSION
+   │
+   ▼
+RESPONSE
+```
 
-- Autenticación híbrida (Session + JWT)
-- Passport (Local, JWT, GitHub)
-- Protección de rutas
-- Control de acceso por roles (admin/user)
-- MongoDB Atlas
-- Buenas prácticas de seguridad
+---
+
+## Endpoints Principales
+
+### Auth
+
+| Método | Endpoint                    |
+| ------ | --------------------------- |
+| POST   | /api/v1/auth/register       |
+| POST   | /api/v1/auth/login          |
+| POST   | /api/v1/auth/login-jwt      |
+| POST   | /api/v1/auth/login-passport |
+| POST   | /api/v1/auth/logout         |
+
+### Usuario autenticado
+
+| Método | Endpoint                          |
+| ------ | --------------------------------- |
+| GET    | /api/v1/auth/profile              |
+| GET    | /api/v1/auth/current              |
+| GET    | /api/v1/auth/profile-jwt          |
+| GET    | /api/v1/auth/profile-passport-jwt |
+
+### Roles
+
+| Método | Endpoint           |
+| ------ | ------------------ |
+| GET    | /api/v1/auth/admin |
+
+### OAuth GitHub
+
+| Método | Endpoint                     |
+| ------ | ---------------------------- |
+| GET    | /api/v1/auth/github          |
+| GET    | /api/v1/auth/github/callback |
+
+### Productos
+
+| Método | Endpoint                 |
+| ------ | ------------------------ |
+| GET    | /api/v1/products/jwt     |
+| GET    | /api/v1/products/jwt/all |
+| POST   | /api/v1/products/jwt     |
+| PUT    | /api/v1/products/jwt/:id |
+| DELETE | /api/v1/products/jwt/:id |
+
+---
+
+## JWT
+
+Payload utilizado:
+
+```json
+{
+  "id": "user_id",
+  "email": "user@email.com",
+  "role": "user"
+}
+```
+
+Expiración:
+
+```txt
+1 hora
+```
+
+---
+
+## OAuth GitHub
+
+La aplicación permite autenticación mediante GitHub utilizando Passport GitHub Strategy.
+
+Proceso:
+
+1. Usuario accede a `/api/v1/auth/github`
+2. GitHub solicita autorización
+3. GitHub redirecciona al callback
+4. Passport valida identidad
+5. Se crea usuario si no existe
+6. Se genera JWT
+7. Se crea cookie HttpOnly
+
+---
+
+## Seguridad Implementada
+
+* Hash de contraseñas con bcrypt
+* JWT firmado con secreto privado
+* Expiración de tokens
+* Cookies HttpOnly
+* SameSite=Lax
+* Control de acceso por roles
+* Middleware de autenticación
+* Middleware de autorización
+* Manejo global de errores
+
+---
+
+## Proyecto Académico
+
+Proyecto desarrollado como entrega final del curso Backend II.
+
+Se implementó una arquitectura de autenticación híbrida integrando:
+
+* Sessions
+* JWT
+* Passport Local
+* Passport JWT
+* Passport GitHub OAuth
+
+aplicando buenas prácticas de organización, seguridad y separación de responsabilidades.
+
 
